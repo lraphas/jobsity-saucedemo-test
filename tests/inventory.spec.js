@@ -1,43 +1,26 @@
-import { test, expect } from '@playwright/test';
-
-
-test.beforeEach(async ({ page }) => {
-  await page.goto('/');
-});
+import { test } from '@playwright/test';
+import { LoginPage } from '../pages/LoginPage';
+import { InventoryPage } from '../pages/InventoryPage';
 
 test.describe('Inventory Tests - SauceDemo', () => {
-  
-  test('Check unique Inventory images with Standard User', async ({ page }) => {
-    await page.fill('[data-test="username"]', 'standard_user');
-    await page.fill('[data-test="password"]', 'secret_sauce');
-    await page.click('[data-test="login-button"]');
+  let loginPage;
+  let inventoryPage;
 
-    await expect(page).toHaveURL(/.*inventory\.html/);
-    await expect(page.locator('.inventory_list')).toBeVisible();
-    
-    const imageSrcs = await page.$$eval('.inventory_item_img img', imgs =>
-      imgs.map(img => img.getAttribute('src'))
-    );
-
-    const uniqueImages = new Set(imageSrcs);
-
-    expect(uniqueImages.size).toBe(imageSrcs.length);
+  test.beforeEach(async ({ page }) => {
+    loginPage = new LoginPage(page);
+    inventoryPage = new InventoryPage(page);
+    await loginPage.goto();
   });
 
-  test('Check unique Inventory images with Problem User', async ({ page }) => {
-    await page.fill('[data-test="username"]', 'problem_user');
-    await page.fill('[data-test="password"]', 'secret_sauce');
-    await page.click('[data-test="login-button"]');
+  test('Check unique Inventory images with Standard User', async () => {
+    await loginPage.login('standard_user', 'secret_sauce');
+    await inventoryPage.assertOnInventoryPage();
+    await inventoryPage.assertImagesAreUnique();
+  });
 
-    await expect(page).toHaveURL(/.*inventory\.html/);
-    await expect(page.locator('.inventory_list')).toBeVisible();
-    
-    const imageSrcs = await page.$$eval('.inventory_item_img img', imgs =>
-      imgs.map(img => img.getAttribute('src'))
-    );
-
-    const uniqueImages = new Set(imageSrcs);
-
-    expect(uniqueImages.size).toBe(imageSrcs.length);
+  test('Check unique Inventory images with Problem User', async () => {
+    await loginPage.login('problem_user', 'secret_sauce');
+    await inventoryPage.assertOnInventoryPage();
+    await inventoryPage.assertImagesAreUnique();
   });
 });
