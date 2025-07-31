@@ -1,9 +1,11 @@
 import { test } from '@playwright/test';
+import usersData from '../test-data/users.json';
 import { LoginPage } from '../pages/LoginPage';
 import { InventoryPage } from '../pages/InventoryPage';
 
 test.describe('Inventory Tests - SauceDemo', () => {
   let loginPage;
+  let user;
   let inventoryPage;
 
   test.beforeEach(async ({ page }) => {
@@ -13,13 +15,17 @@ test.describe('Inventory Tests - SauceDemo', () => {
   });
 
   test('Check unique Inventory images with Standard User', async () => {
-    await loginPage.login('standard_user', 'secret_sauce');
+    user = usersData.standard_user;
+
+    await loginPage.login(user.username, user.password);
     await inventoryPage.assertOnInventoryPage();
     await inventoryPage.assertImagesAreUnique();
   });
 
   test('Check unique Inventory images with Problem User', async () => {
-    await loginPage.login('problem_user', 'secret_sauce');
+    user = usersData.problem_user;
+
+    await loginPage.login(user.username, user.password);
     await inventoryPage.assertOnInventoryPage();
     await inventoryPage.assertImagesAreUnique();
   });
