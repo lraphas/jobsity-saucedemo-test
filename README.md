@@ -1,4 +1,4 @@
-# jobsity-saucedemo-automation-test
+# saucedemo-automation-test
 QA Sauce demo Automation Project
 
 
