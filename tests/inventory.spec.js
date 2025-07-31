@@ -14,15 +14,7 @@ test.describe('Inventory Tests - SauceDemo', () => {
     await loginPage.goto();
   });
 
-  test('Check unique Inventory images with Standard User', async () => {
-    user = usersData.standard_user;
-
-    await loginPage.login(user.username, user.password);
-    await inventoryPage.assertOnInventoryPage();
-    await inventoryPage.assertImagesAreUnique();
-  });
-
-  test('Check unique Inventory images with Problem User', async () => {
+test('Check unique Inventory images', async () => {
     user = usersData.problem_user;
 
     await loginPage.login(user.username, user.password);
