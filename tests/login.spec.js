@@ -1,28 +1,24 @@
-import { test, expect } from '@playwright/test';
-
-
-test.beforeEach(async ({ page }) => {
-  await page.goto('/');
-});
+import { test } from '@playwright/test';
+import { LoginPage } from '../pages/LoginPage';
+import { InventoryPage } from '../pages/InventoryPage';
 
 test.describe('Login Tests - SauceDemo', () => {
-  
-  test('Sucessfull Login', async ({ page }) => {
-    await page.fill('[data-test="username"]', 'standard_user');
-    await page.fill('[data-test="password"]', 'secret_sauce');
-    await page.click('[data-test="login-button"]');
+  let loginPage;
 
-    await expect(page).toHaveURL(/.*inventory\.html/);
-    await expect(page.locator('.inventory_list')).toBeVisible();
+  test.beforeEach(async ({ page }) => {
+    loginPage = new LoginPage(page);
+    await loginPage.goto();
   });
 
-  test('Loocked out User', async ({ page }) => {
-    await page.fill('[data-test="username"]', 'locked_out_user');
-    await page.fill('[data-test="password"]', 'secret_sauce');
-    await page.click('[data-test="login-button"]');
+  test('Successful Login', async ({ page }) => {
+    const inventoryPage = new InventoryPage(page);
 
-    const errorMsg = page.locator('[data-test="error"]');
-    await expect(errorMsg).toBeVisible();
-    await expect(errorMsg).toContainText('Epic sadface: Sorry, this user has been locked out.');
+    await loginPage.login('standard_user', 'secret_sauce');
+    await inventoryPage.assertOnInventoryPage();
+  });
+
+  test('Locked out User', async () => {
+    await loginPage.login('locked_out_user', 'secret_sauce');
+    await loginPage.assertLoginError('Epic sadface: Sorry, this user has been locked out.');
   });
 });
